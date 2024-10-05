@@ -1,5 +1,7 @@
 import streamlit as st
 import leafmap.foliumap as leafmap
+import time
+import ollama
 
 st.set_page_config(layout="wide")
 
@@ -8,33 +10,47 @@ markdown = """
 A Streamlit map template
 <https://github.com/opengeos/streamlit-map-template>
 """
-
 st.sidebar.title("About")
 st.sidebar.info(markdown)
 logo = "https://i.imgur.com/UbOXYAU.png"
 st.sidebar.image(logo)
 
 # Customize page title
-st.title("Streamlit for Geospatial Applications")
+st.title("Interactive Map with Chatbot")
 
-st.markdown(
-    """
-    This multipage app template demonstrates various interactive web apps created using [streamlit](https://streamlit.io) and [leafmap](https://leafmap.org). It is an open-source project and you are very welcome to contribute to the [GitHub repository](https://github.com/opengeos/streamlit-map-template).
-    """
-)
+# Use columns to adjust layout
+col1, col2 = st.columns([3, 1])  # La prima colonna è più grande (mappa), la seconda è più piccola (chatbot)
 
-st.header("Instructions")
+with col1:
+    # Map section
+    m = leafmap.Map(minimap_control=True)
+    m.add_basemap("OpenTopoMap")
+    m.to_streamlit(height=500)
 
-markdown = """
-1. For the [GitHub repository](https://github.com/opengeos/streamlit-map-template) or [use it as a template](https://github.com/opengeos/streamlit-map-template/generate) for your own project.
-2. Customize the sidebar by changing the sidebar text and logo in each Python files.
-3. Find your favorite emoji from https://emojipedia.org.
-4. Add a new app to the `pages/` directory with an emoji in the file name, e.g., `1_🚀_Chart.py`.
+with col2:
+    # Chatbot section
+    def stream_data(text):
+        delay = 0.1  # Imposta un ritardo per il flusso dei dati
+        for word in text.split():
+            yield word + " "
+            time.sleep(delay)
 
-"""
+    # Input per il prompt (istruzione)
+    instruction = st.chat_input("Ask Emiscan")
 
-st.markdown(markdown)
+    if instruction:
+        # Visualizza l'input dell'utente
+        with st.chat_message("user"):
+            st.write(instruction)
 
-m = leafmap.Map(minimap_control=True)
-m.add_basemap("OpenTopoMap")
-m.to_streamlit(height=500)
+        # Elaborazione del prompt
+        with st.spinner("Thinking ..."):
+            result = ollama.chat(model="francescomassa/emiscanmk2", messages=[{
+                "role": "user",
+                "input": "",  # Nessun input aggiuntivo
+                "content": instruction,
+            }])
+
+        # Estrae la risposta e la mostra
+        response = result["message"]["content"]  # 'content' è il campo che contiene la risposta
+        st.write_stream(stream_data(response))  # Mostra la risposta del chatbot
