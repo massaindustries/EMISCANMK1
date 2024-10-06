@@ -2,17 +2,22 @@ import streamlit as st
 import leafmap.foliumap as leafmap
 import time
 import ollama
+import sys
+
+
+print(sys.executable)
+print(sys.path)
 
 st.set_page_config(layout="wide")
 
 # Customize the sidebar
 markdown = """
-A Streamlit map template
-<https://github.com/opengeos/streamlit-map-template>
+Project repository:
+<https://github.com/massaindustries/EMISCANMK1>
 """
-st.sidebar.title("About")
+st.sidebar.title("Go Pro")
 st.sidebar.info(markdown)
-logo = "https://i.imgur.com/UbOXYAU.png"
+logo = "https://i.imgur.com/CsBdfY1.png"
 st.sidebar.image(logo)
 
 # Customize page title
@@ -24,10 +29,13 @@ col1, col2 = st.columns([3, 1])  # La prima colonna è più grande (mappa), la s
 with col1:
     # Map section
     m = leafmap.Map(minimap_control=True)
-    m.add_basemap("OpenTopoMap")
+    m.add_basemap("ESA WorldCover 2021")
     m.to_streamlit(height=500)
 
 with col2:
+
+    st.image("https://i.imgur.com/6hr2Wxy.png", use_column_width=True)
+
     # Chatbot section
     def stream_data(text):
         delay = 0.1  # Imposta un ritardo per il flusso dei dati

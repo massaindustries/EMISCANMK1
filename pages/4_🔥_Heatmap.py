@@ -8,9 +8,14 @@ A Streamlit map template
 <https://github.com/opengeos/streamlit-map-template>
 """
 
-st.sidebar.title("About")
+# Customize the sidebar
+markdown = """
+Project repository:
+<https://github.com/massaindustries/EMISCANMK1>
+"""
+st.sidebar.title("Go Pro")
 st.sidebar.info(markdown)
-logo = "https://i.imgur.com/UbOXYAU.png"
+logo = "https://i.imgur.com/CsBdfY1.png"
 st.sidebar.image(logo)
 
 st.title("Heatmap")
